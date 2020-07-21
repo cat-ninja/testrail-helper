@@ -1,0 +1,26 @@
+{
+  "name": "testrail-helper",
+  "version": "1.0.0",
+  "description": "TestRail plugin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cat-ninja/testrail-publish.git"
+  },
+  "author": "cat-ninja",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cat-ninja/testrail-publish/issues"
+  },
+  "homepage": "https://github.com/cat-ninja/testrail-publish#readme",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "fast-xml-parser": "^3.17.4",
+    "form-data": "^3.0.0",
+    "lodash": "^4.17.19",
+    "moment-timezone": "^0.5.31"
+  }
+}

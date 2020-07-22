@@ -3,17 +3,12 @@ const fs = require("fs");
 const path = require("path");
 
 class TestRail {
-  constructor(defaultConfig) {
-    this.host = defaultConfig.host;
-    this.user = defaultConfig.user;
-    this.password = defaultConfig.password;
+  constructor(config) {
+    this.host = config.host;
+    this.user = config.user;
+    this.password = config.password;
     this.uri = "/index.php?/api/v2/";
-
-    // const b = new Buffer(`${this.user}:${this.password}`);
-    // const basicAuth = b.toString("base64");
-
     axios.defaults.baseURL = this.host + this.uri;
-    // axios.defaults.headers.Authorization = `Basic ${basicAuth}`;
     axios.defaults.auth = {
       username: this.user,
       password: this.password,
@@ -25,7 +20,7 @@ class TestRail {
     try {
       const res = await axios({
         method: "post",
-        url: "add_plan/" + projectId,
+        url: `add_plan/${projectId}`,
         data,
       });
       return res.data;
@@ -38,7 +33,7 @@ class TestRail {
     try {
       const res = await axios({
         method: "post",
-        url: "add_plan_entry/" + planId,
+        url: `add_plan_entry/${planId}`,
         data,
       });
       return res.data;
@@ -53,7 +48,7 @@ class TestRail {
     try {
       const res = await axios({
         method: "get",
-        url: "get_suites/" + projectId,
+        url: `get_suites/${projectId}`,
         headers: {
           "content-type": "application/json",
         },
@@ -68,7 +63,7 @@ class TestRail {
     try {
       const res = await axios({
         method: "get",
-        url: "get_configs/" + projectId,
+        url: `get_configs/${projectId}`,
         headers: {
           "content-type": "application/json",
         },
@@ -83,7 +78,7 @@ class TestRail {
     try {
       const res = await axios({
         method: "post",
-        url: "add_run/" + projectId,
+        url: `add_run/${projectId}`,
         data,
       });
 
@@ -97,7 +92,7 @@ class TestRail {
     try {
       const res = await axios({
         method: "post",
-        url: "update_run/" + runId,
+        url: `update_run/${runId}`,
         data,
       });
       console.log(`The run with id: ${runId} is updated`);
@@ -120,44 +115,39 @@ class TestRail {
   }
 
   async getResultsForCase(runId, caseId) {
-    return axios({
-      method: "get",
-      url: "get_results_for_case/" + runId + "/" + caseId,
-      headers: {
-        "content-type": "application/json",
-      },
-    })
-      .then((res) => {
-        console.log(`The response is ${JSON.stringify(res.data)}`);
-        console.log(`The case ${caseId} on run ${runId} is updated`);
-        return res.data;
-      })
-      .catch((error) => {
-        console.error(
-          `Cannnot get results for case ${caseId} on run ${runId} due to ${error}`
-        );
+    try {
+      const res = await axios({
+        method: "get",
+        url: `get_results_for_case/${runId}/${caseId}`,
+        headers: {
+          "content-type": "application/json",
+        },
       });
+      return res.data;
+    } catch (error) {
+      console.error(
+        `Cannnot get results for case ${caseId} on run ${runId} due to ${error}`
+      );
+    }
   }
 
   async addResultsForCases(runId, data) {
-    return axios({
-      method: "post",
-      url: "add_results_for_cases/" + runId,
-      data,
-    })
-      .then((res) => {
-        console.log(`The response is ${JSON.stringify(res.data)}`);
-        return res.data;
-      })
-      .catch((error) => {
-        console.error(
-          `Cannnot add result for case due to ${error}. \n${JSON.stringify(
-            error,
-            null,
-            2
-          )}`
-        );
+    try {
+      const res = await axios({
+        method: "post",
+        url: `add_results_for_cases/${runId}`,
+        data,
       });
+      return res.data;
+    } catch (error) {
+      console.error(
+        `Cannnot add result for case due to ${error}. \n${JSON.stringify(
+          error,
+          null,
+          2
+        )}`
+      );
+    }
   }
 
   async addAttachmentToResult(resultId, imageFile) {
@@ -167,7 +157,7 @@ class TestRail {
       fs.createReadStream(path.join(global.output_dir, imageFile.toString()))
     );
 
-    axios({
+    await axios({
       method: "post",
       data: form,
       url: "add_attachment_to_result/" + resultId,

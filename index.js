@@ -1,13 +1,38 @@
 const fs = require("fs");
 const path = require("path");
-const config = JSON.parse(fs.readFileSync("config.json"));
+const program = require("commander");
+
+program.version("1.0.0");
+program
+  .option("-d, --dir <dir>", "Directory to scan")
+  .option("-c, --config <config>", "JSON file with the configuration")
+  .option("-h, --host <host>", "URL of the host")
+  .option("-u, --user <user>", "Username")
+  .option("-p, --password <password>", "Password")
+  .option("-s, --suite <suite>", "Suite ID")
+  .option("-pr, --project <project>", "Project ID");
+program.parse(process.argv);
+
+var config = {};
+var basePath = path.resolve("output");
+
+if (program.config) {
+  config = JSON.parse(fs.readFileSync(path.resolve(program.config)));
+} else {
+  config.host = program.host;
+  config.user = program.user;
+  config.password = program.password;
+  config.suiteId = program.suite;
+  config.projectId = program.project;
+}
+if (program.dir) basePath = program.dir;
+
 const testrail = require("./testrail").createClient(config);
 const moment = require("moment-timezone");
 const parser = require("fast-xml-parser");
 const _ = require("lodash");
 var tests = { results: [] };
 
-const basePath = "C:\\Users\\green\\Desktop\\projects\\aqa-js\\output";
 const files = fs.readdirSync(basePath).filter((f) => f.includes(".xml"));
 for (const file of files) {
   const data = fs.readFileSync(path.join(basePath, file)).toString();

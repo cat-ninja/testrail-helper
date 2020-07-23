@@ -1,8 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 const program = require("commander");
-
-program.version("1.0.0");
 program
   .option("-d, --dir <dir>", "Directory to scan")
   .option("-c, --config <config>", "JSON file with the configuration")
@@ -10,7 +8,8 @@ program
   .option("-u, --user <user>", "Username")
   .option("-p, --password <password>", "Password")
   .option("-s, --suite <suite>", "Suite ID")
-  .option("-pr, --project <project>", "Project ID");
+  .option("-pr, --project <project>", "Project ID")
+  .option("-pl, --plan <plan>", "Plan ID");
 program.parse(process.argv);
 
 var config = {};
@@ -24,6 +23,7 @@ if (program.config) {
   config.password = program.password;
   config.suiteId = program.suite;
   config.projectId = program.project;
+  config.planId = program.plan;
 }
 if (program.dir) basePath = program.dir;
 
@@ -78,16 +78,36 @@ function compute(testCase) {
 }
 
 async function submit(tests) {
-  const run = await testrail.addRun(config.projectId, {
-    suite_id: config.suiteId,
-    name: `Automation run on ${moment()
-      .tz("America/Denver")
-      .format("YYYY-MM-DD h:mm")}`,
-    include_all: false,
-  });
-  await testrail.updateRun(run.id, {
-    case_ids: tests.results.map((t) => t.case_id),
-  });
+  const name = `Automation run on ${moment()
+    .tz("America/Denver")
+    .format("YYYY-MM-DD h:mm")}`;
+  const caseIds = tests.results.map((t) => t.case_id);
+  var run = undefined;
+  if (config.planId) {
+    const data = {
+      suite_id: config.suiteId,
+      name: name,
+      include_all: false,
+      case_ids: caseIds,
+      runs: [
+        {
+          include_all: false,
+          case_ids: caseIds,
+        },
+      ],
+    };
+    const planEntry = await testrail.addPlanEntry(config.planId, data);
+    run = planEntry.runs[0];
+  } else {
+    run = await testrail.addRun(config.projectId, {
+      suite_id: config.suiteId,
+      name: name,
+      include_all: false,
+    });
+    await testrail.updateRun(run.id, {
+      case_ids: caseIds,
+    });
+  }
   await testrail.addResultsForCases(run.id, tests);
   return { run: run };
 }

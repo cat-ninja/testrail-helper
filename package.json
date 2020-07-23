@@ -1,6 +1,6 @@
 {
   "name": "testrail-helper",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@cat-ninja"
   },
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cat-ninja/testrail-publish.git"
+    "url": "git+https://github.com/cat-ninja/testrail-helper.git"
   },
   "author": "cat-ninja",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/cat-ninja/testrail-publish/issues"
+    "url": "https://github.com/cat-ninja/testrail-helper/issues"
   },
-  "homepage": "https://github.com/cat-ninja/testrail-publish#readme",
+  "homepage": "https://github.com/cat-ninja/testrail-helper#readme",
   "dependencies": {
     "axios": "^0.19.2",
     "commander": "^6.0.0",
